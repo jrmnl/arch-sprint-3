@@ -1,0 +1,88 @@
+@startuml
+rectangle "User and Home Management" {
+    entity User {
+      * user_id
+      * email
+      name
+    }
+
+    entity Home {
+      * home_id
+      * name
+      location
+      --
+      * user_id
+    }
+
+    User "1" -- "1..*" Home
+}
+
+rectangle "Device Management Service" {
+    entity DeviceItem {
+      * device_item_id
+      * name
+      * model
+      * serial_number
+      * status
+      * device_type
+      * device_address
+      --
+      * home_id
+      * user_id
+    }
+
+    Home "1" -- "0..*" DeviceItem
+    User "1" -- "0..*" DeviceItem
+}
+
+rectangle "TelemetryService" {
+    entity DeviceItemReference {
+      * device_item_id // дублируем информацию, чтобы знать с какого йстроства собирать информацию
+      * device_type
+    }
+
+    entity Telemetry {
+      * telemetry_id
+      * collected_at
+      * value
+      * value_type
+      --
+      * device_item_id
+    }
+
+    DeviceItemReference "1" -- "1" DeviceItem
+    Telemetry "0..*" -- "1" DeviceItemReference 
+}
+
+rectangle "Automation Service" {
+    entity Scenario {
+      * scenario_id
+      * name
+      * is_active
+      --
+      * user_id
+    }
+
+    entity Condition {
+      * condition_id
+      * order_num
+      * condition // json, гетерогенный тип условия
+      --
+      * scenario_id
+    }
+
+    entity Action {
+      * action_id
+      * order_num
+      * action  // json, гетерогенный тип действия
+      --
+      * scenario_id
+      * device_item_id
+    }
+
+    Scenario "1" -- "0..*" Condition
+    Scenario "1" -- "0..*" Action
+    Action "0..*" -- "1" DeviceItem
+    User "1" -- "0..*" Scenario
+}
+@enduml

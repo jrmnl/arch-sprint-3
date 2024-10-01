@@ -1,0 +1,51 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person_Ext(user, "Пользователь")
+System_Ext(device, "Девайс")
+
+System_Boundary(smart_home_system, "SaaS: Умный дом") {
+  Container(api_gateway, "API GateWay")
+
+  Container(user_service, "UserAndHomeManagementService")
+  ContainerDb(user_db, "UserAndHomeManagementService DB")
+
+  Container(notification_service, "NotificationService")
+
+  Container(device_management_service, "DeviceManagementService")
+  ContainerDb(device_management_db, "DeviceManagement DB")
+
+  Container(automation_service, "AutomationService")
+  ContainerDb(automation_service_db, "AutomationServiceDB")
+
+  Container(telemetry_service, "TelemetryService")
+  ContainerDb(telemetry_db, "Telemetry DB")
+
+  ContainerQueue(kafka, "Kafka")
+}
+
+Rel(user, api_gateway, "Взаимодествуйет с системой через", "https")
+Rel(device, api_gateway, "Взаимодествуйет с системой через", "https")
+
+Rel_D(api_gateway, device_management_service, "")
+Rel_D(api_gateway, user_service,  "")
+Rel_D(api_gateway, telemetry_service, "")
+Rel_D(api_gateway, automation_service, "")
+
+Rel(user_service, user_db, "")
+Rel(telemetry_service, telemetry_db, "")
+Rel(device_management_service, device_management_db, "")
+Rel(automation_service, automation_service_db, "")
+
+Rel_U(device_management_service, device, "Отправить команду")
+
+BiRel_U(kafka, device_management_service, "")
+BiRel_U(kafka, user_service, "")
+BiRel_U(kafka, telemetry_service, "")
+BiRel_U(kafka, notification_service, "")
+BiRel_U(kafka, automation_service, "")
+
+Rel_U(notification_service, user, "Уведомляет с помощью push-сообщений в смартфоне")
+
+SHOW_LEGEND()
+@enduml

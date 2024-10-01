@@ -1,0 +1,18 @@
+@startuml system context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+Person_Ext(user, "Пользователь")
+
+System(monolith, "Smart Home Monolith")
+
+Boundary(c1, "Дом/квартира"){
+  System_Ext(temperature_sensor, "Датчик температуры")
+  System_Ext(smart_heater, "«Умный» обогреватель")
+}
+
+Rel(user, monolith, "Вкл/выкл отопление; устаналивает желаемую темперутуру; смотритит текущую температуру")
+Rel(monolith, temperature_sensor, "Узнает текущую темперутуру")
+Rel(monolith, smart_heater, "Вкл/выкл отопление")
+
+SHOW_LEGEND()
+@enduml

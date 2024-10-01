@@ -1,0 +1,80 @@
+./kafka-topics.sh --bootstrap-server kafka-1:19092,kafka-2:19092,kafka-3:19092 --create --topic device --replication-factor 2 --partitions 3
+
+./kafka-console-consumer.sh --bootstrap-server kafka-1:19092,kafka-2:19092,kafka-3:19092 --topic device --from-beginning
+
+asyncapi: 3.0.0
+info:
+  title: DeviceManagement - Сервис управления устройствами
+  version: 1.0.0
+
+operations:
+  deviceChanged:
+    action: send
+    channel:
+      $ref: '#/channels/device'
+
+channels:
+  device:
+    description: События произошедшие с устройством
+    address: device
+    messages: 
+      deviceEvent:
+        contentType: 'application/json'
+        payload:
+          type: object
+          required:
+            - deviceId
+            - eventType
+          properties:
+            deviceId:
+              type: string
+              description: Идентификатор устройства в системе в формате uuid
+              example: 5a539045-a909-4549-b2c4-c3c203d80bb9
+            eventType:
+              type: string
+              description: Тип события
+              enum:
+                - Registered
+                - Deleted
+            details:
+              $ref: '#/components/schemas/NewDeviceInfo'
+
+components:
+  schemas:
+    NewDeviceInfo:
+      type: object
+      description: Данные о новом устройстве
+      required:
+        - deviceType
+        - name
+        - model
+        - deviceAddress
+        - serialNumber
+        - status
+        - userId
+        - homeId
+      properties:
+        deviceType:
+          type: string
+          maxLength: 255
+        name:
+          type: string
+          maxLength: 255
+        model:
+          type: string
+          maxLength: 255
+        deviceAddress:
+          type: string
+          maxLength: 255
+        serialNumber:
+          type: string
+          maxLength: 255
+        status:
+          type: string
+          maxLength: 50
+        userId:
+          type: string
+          example: 5a539045-a909-4549-b2c4-c3c203d80bb9
+        homeId:
+          type: string
+          example: 5a539045-a909-4549-b2c4-c3c203d80bb9
